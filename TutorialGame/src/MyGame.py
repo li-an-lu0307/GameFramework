@@ -8,6 +8,7 @@ from mlgame.view.decorator import check_game_progress, check_game_result
 from mlgame.view.view_model import Scene, create_text_view_data, create_scene_progress_data, create_asset_init_data, \
     create_image_view_data, create_rect_view_data
 
+from .Bullet import Bullet
 from .Mob import Mob
 from .Player import Player
 from .SoundController import SoundController
@@ -71,6 +72,9 @@ class MyGame(PaiaGame):
         hits = pygame.sprite.spritecollide(self.player, self.mobs, True, pygame.sprite.collide_rect_ratio(0.8))
         if hits:
             self.player.collide_with_mobs()
+
+        for mob in self.mobs:
+            self._create_bullets(is_player=False, init_pos=mob.rect.center)
 
         # 判定是否重置遊戲
         if not self.is_running:
@@ -160,6 +164,8 @@ class MyGame(PaiaGame):
         Get the position of MyGame objects for drawing on the web
         """
         game_obj_list = []
+        for bullet in self.bulllets:
+            game_obj_list.append(bullet.game_object_data)
         for mob in self.mobs:
             if isinstance(mob, Mob):
                 game_obj_list.append(mob.game_object_data)
@@ -233,3 +239,7 @@ class MyGame(PaiaGame):
             # 建立mob物件，並加入到mob的集合裡
             mob = Mob(pygame.Rect(0, -100, WIDTH, HEIGHT+100))
             self.mobs.add(mob)
+
+    def _create_bullets(self, is_player: bool, init_pos: tuple):
+        bullet = Bullet(is_player = is_player, init_pos = init_pos)
+        self.bullets.add(bullet)
